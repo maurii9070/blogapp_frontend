@@ -5,31 +5,22 @@ const currentYear = new Date().getFullYear()
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="border-b border-gray-200 dark:border-gray-800">
-      <UContainer class="flex items-center justify-between h-16">
-        <!-- Logo / Brand -->
-        <NuxtLink to="/" class="text-xl font-bold text-gray-900 dark:text-white hover:text-primary-500 transition-colors">
-          Blog App
-        </NuxtLink>
+    <BlogHeader />
 
-        <!-- Navigation -->
-        <div class="flex items-center gap-4">
-          <NuxtLink
-            to="/"
-            class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-500 transition-colors"
-          >
-            Inicio
-          </NuxtLink>
-
-          <UButton variant="ghost" label="Iniciar Sesión" />
-        </div>
-      </UContainer>
-    </header>
-
-    <!-- Main Content -->
+    <!-- Main Content with Sidebar -->
     <main class="flex-1">
       <UContainer class="py-8">
-        <slot />
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Main Content Area -->
+          <div class="flex-1 min-w-0">
+            <slot />
+          </div>
+
+          <!-- Sidebar -->
+          <aside class="w-full lg:w-80 shrink-0">
+            <RecentPostsSidebar />
+          </aside>
+        </div>
       </UContainer>
     </main>
 
