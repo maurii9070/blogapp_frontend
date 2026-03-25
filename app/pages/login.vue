@@ -10,6 +10,8 @@ const toast = useToast()
 const { login } = useAuth()
 const route = useRoute()
 
+const { start, finish } = useLoadingIndicator()
+
 const state = reactive<InferInput<typeof LoginRequestSchema>>({
   email: '',
   password: '',
@@ -19,6 +21,7 @@ const state = reactive<InferInput<typeof LoginRequestSchema>>({
 const isSubmitting = ref(false)
 
 async function onSubmit(): Promise<void> {
+  start()
   if (isSubmitting.value)
     return
 
@@ -38,6 +41,7 @@ async function onSubmit(): Promise<void> {
     await navigateTo(redirectTo)
   }
   catch (error) {
+    finish({ error: true })
     if (import.meta.dev)
       console.error(error)
 
@@ -50,6 +54,7 @@ async function onSubmit(): Promise<void> {
   }
   finally {
     isSubmitting.value = false
+    finish()
   }
 }
 </script>
