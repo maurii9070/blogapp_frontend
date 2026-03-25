@@ -169,7 +169,14 @@ async function handleLogout() {
     <template #fallback>
       <header class="sticky top-0 z-50 bg-default/75 backdrop-blur border-b border-default">
         <div class="max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="h-(--ui-header-height)" />
+          <div class="h-(--ui-header-height) flex items-center justify-between gap-4">
+            <USkeleton class="h-6 w-28" />
+            <div class="hidden lg:flex items-center gap-2">
+              <USkeleton class="h-8 w-18 rounded-md" />
+              <USkeleton class="h-8 w-24 rounded-md" />
+            </div>
+            <USkeleton class="h-8 w-8 rounded-md lg:hidden" />
+          </div>
         </div>
       </header>
     </template>
