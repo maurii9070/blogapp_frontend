@@ -13,6 +13,9 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+    '/login': { ssr: false },
+    '/profile': { ssr: false },
+    '/posts/create': { ssr: false },
   },
 
   runtimeConfig: {

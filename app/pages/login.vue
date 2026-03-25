@@ -8,6 +8,7 @@ definePageMeta({
 
 const toast = useToast()
 const { login } = useAuth()
+const route = useRoute()
 
 const state = reactive<InferInput<typeof LoginRequestSchema>>({
   email: '',
@@ -33,7 +34,8 @@ async function onSubmit(): Promise<void> {
       icon: 'i-lucide-circle-check',
     })
 
-    await navigateTo('/')
+    const redirectTo = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    await navigateTo(redirectTo)
   }
   catch (error) {
     if (import.meta.dev)
