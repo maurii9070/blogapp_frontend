@@ -22,6 +22,15 @@ export const PostSchema = v.object({
 })
 export type Post = v.InferOutput<typeof PostSchema>
 
+export const CategorySchema = v.object({
+  id: v.number(),
+  name: v.string(),
+})
+export type Category = v.InferOutput<typeof CategorySchema>
+
+export const CategoriesResponseSchema = v.array(CategorySchema)
+export type CategoriesResponse = v.InferOutput<typeof CategoriesResponseSchema>
+
 export const PublishedPostsResponseSchema = v.object({
   items: v.array(PublishedPostSchema),
   totalCount: v.number(),
@@ -30,3 +39,12 @@ export const PublishedPostsResponseSchema = v.object({
   hasNextPage: v.boolean(),
 })
 export type PublishedPostsResponse = v.InferOutput<typeof PublishedPostsResponseSchema>
+
+export const CreatePostSchema = v.object({
+  title: v.pipe(v.string(''), v.minLength(1, 'El título es requerido'), v.maxLength(200, 'Titulo debe tener máximo 200 caracteres')),
+  content: v.string('El contenido es requerido'),
+  categoryId: v.pipe(v.number(), v.integer(), v.minValue(1)),
+  tagNames: v.array(v.string()),
+  authorId: v.string('El ID del autor es invalido'),
+})
+export type CreatePost = v.InferOutput<typeof CreatePostSchema>

@@ -3,6 +3,7 @@ interface SessionUser {
   email: string
   userName: string
   fullName: string
+  roles: string[]
 }
 
 type SessionStatus = 'unknown' | 'loading' | 'authenticated' | 'guest'

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth', 'editor'],
 })
 </script>
 
 <template>
-  <div class="mx-auto max-w-3xl">
-    <UCard :ui="{ body: 'space-y-4 p-6 sm:p-8' }">
+  <div class="mx-auto max-w-5xl">
+    <UCard
+      class="border-default/80 bg-default/95 shadow-xl shadow-primary/5"
+      :ui="{ body: 'space-y-6 p-6 sm:p-8' }"
+    >
       <div class="space-y-2">
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           Editor
@@ -15,17 +18,11 @@ definePageMeta({
           Crear nuevo post
         </h1>
         <p class="text-sm text-muted">
-          Vista placeholder para confirmar acceso autenticado.
+          Escribe tu contenido con un editor Markdown sencillo y publica cuando este listo.
         </p>
       </div>
 
-      <UAlert
-        color="info"
-        variant="soft"
-        icon="i-lucide-info"
-        title="Proxima feature"
-        description="Aca vamos a implementar el formulario completo de creacion de posts."
-      />
+      <PostEditorForm />
     </UCard>
   </div>
 </template>
