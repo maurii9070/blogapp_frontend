@@ -22,6 +22,15 @@ export const PostSchema = v.object({
 })
 export type Post = v.InferOutput<typeof PostSchema>
 
+export const CategorySchema = v.object({
+  id: v.number(),
+  name: v.string(),
+})
+export type Category = v.InferOutput<typeof CategorySchema>
+
+export const CategoriesResponseSchema = v.array(CategorySchema)
+export type CategoriesResponse = v.InferOutput<typeof CategoriesResponseSchema>
+
 export const PublishedPostsResponseSchema = v.object({
   items: v.array(PublishedPostSchema),
   totalCount: v.number(),

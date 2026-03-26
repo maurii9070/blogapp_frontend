@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ToolbarNames } from 'md-editor-v3'
 import type { InferInput } from 'valibot'
+import type { Category } from '~/schemas/post'
 import { MdEditor } from 'md-editor-v3'
 import { CreatePostSchema } from '~/schemas/post'
 import 'md-editor-v3/lib/style.css'
@@ -9,13 +10,6 @@ interface CategoryOption {
   label: string
   value: number
 }
-
-const categoryOptions: CategoryOption[] = [
-  { label: 'Tecnologia', value: 1 },
-  { label: 'Programacion', value: 2 },
-  { label: 'Producto', value: 3 },
-  { label: 'Carrera profesional', value: 4 },
-]
 
 const suggestedTagOptions = [
   'Nuxt',
@@ -33,21 +27,46 @@ const config = useRuntimeConfig()
 const colorMode = useColorMode()
 const { start, finish } = useLoadingIndicator()
 const { user } = useSession()
+const { data: categories, pending: isLoadingCategories } = useCategories()
 
 const editorTheme = computed(() => colorMode.value === 'dark' ? 'dark' : 'light')
 
 const state = reactive<InferInput<typeof CreatePostSchema>>({
   title: '',
   content: '',
-  categoryId: categoryOptions[0]?.value ?? 0,
+  categoryId: 0,
   tagNames: [],
   authorId: user.value?.id ?? '',
 })
+
+const categoryOptions = computed<CategoryOption[]>(() => {
+  const categoryItems = categories.value ?? []
+  return categoryItems.map((category: Category) => ({
+    label: category.name,
+    value: category.id,
+  }))
+})
+
+watch(
+  categoryOptions,
+  (options) => {
+    const [firstOption] = options
+
+    if (!firstOption)
+      return
+
+    if (!state.categoryId || !options.some(option => option.value === state.categoryId))
+      state.categoryId = firstOption.value
+  },
+  { immediate: true },
+)
 
 const availableSuggestedTags = computed(() => {
   const selectedTags = new Set(state.tagNames)
   return suggestedTagOptions.filter(tag => !selectedTags.has(tag))
 })
+
+const canSubmit = computed(() => !isLoadingCategories.value && categoryOptions.value.length > 0)
 
 watch(
   () => user.value?.id,
@@ -153,6 +172,8 @@ async function onSubmit(): Promise<void> {
           :items="categoryOptions"
           value-key="value"
           label-key="label"
+          :loading="isLoadingCategories"
+          :disabled="isLoadingCategories || !categoryOptions.length"
           placeholder="Selecciona una categoria"
           class="w-full"
         />
@@ -220,7 +241,7 @@ async function onSubmit(): Promise<void> {
         icon="i-lucide-send-horizontal"
         label="Publicar post"
         :loading="isSubmitting"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || !canSubmit"
       />
     </div>
   </UForm>
