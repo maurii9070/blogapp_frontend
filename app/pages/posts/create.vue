@@ -18,7 +18,7 @@ definePageMeta({
           Crear nuevo post
         </h1>
         <p class="text-sm text-muted">
-          Escribe tu contenido con un editor Markdown sencillo y publica cuando este listo.
+          Escribe tu contenido con un editor Markdown sencillo y elige si quieres guardarlo como borrador o publicarlo al instante.
         </p>
       </div>
 

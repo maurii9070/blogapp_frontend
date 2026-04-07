@@ -14,13 +14,20 @@ export const PostSchema = v.object({
   title: v.string(),
   content: v.string(),
   slug: v.string(),
-  authorShortId: v.string(),
+  authorId: v.optional(v.string()),
+  authorShortId: v.optional(v.string()),
   createdAt: v.string(),
-  publishedAt: v.string(),
+  publishedAt: v.nullable(v.string()),
   categoryName: v.string(),
   tagNames: v.array(v.string()),
 })
 export type Post = v.InferOutput<typeof PostSchema>
+
+export const CreatePostResponseSchema = v.object({
+  id: v.number(),
+  slug: v.string(),
+})
+export type CreatePostResponse = v.InferOutput<typeof CreatePostResponseSchema>
 
 export const CategorySchema = v.object({
   id: v.number(),
