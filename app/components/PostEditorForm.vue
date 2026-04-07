@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ToolbarNames } from 'md-editor-v3'
 import type { InferInput } from 'valibot'
-import type { Category } from '~/schemas/post'
+import type { Category, CreatePostResponse } from '~/schemas/post'
 import { MdEditor } from 'md-editor-v3'
 import { CreatePostSchema } from '~/schemas/post'
 import 'md-editor-v3/lib/style.css'
@@ -10,6 +10,8 @@ interface CategoryOption {
   label: string
   value: number
 }
+
+type SubmitAction = 'draft' | 'publish'
 
 const suggestedTagOptions = [
   'Nuxt',
@@ -78,6 +80,7 @@ watch(
 )
 
 const isSubmitting = ref(false)
+const submitAction = ref<SubmitAction>('draft')
 
 function normalizeTags(tagNames: string[]): string[] {
   const normalizedTags = tagNames
@@ -113,16 +116,34 @@ async function onSubmit(): Promise<void> {
   }
 
   try {
-    await $fetch('/posts', {
+    const createdPost = await $fetch<CreatePostResponse>('/posts', {
       baseURL: config.public.apiBase,
       credentials: 'include',
       method: 'POST',
       body: payload,
     })
 
+    if (submitAction.value === 'publish') {
+      await $fetch(`/posts/${createdPost.id}/publish`, {
+        baseURL: config.public.apiBase,
+        credentials: 'include',
+        method: 'PATCH',
+      })
+
+      toast.add({
+        title: 'Post publicado',
+        description: 'Tu post ya esta visible para todos.',
+        color: 'success',
+        icon: 'i-lucide-circle-check',
+      })
+
+      await navigateTo(`/posts/${createdPost.id}/${createdPost.slug}`)
+      return
+    }
+
     toast.add({
-      title: 'Post creado',
-      description: 'Tu publicacion se guardo correctamente.',
+      title: 'Borrador guardado',
+      description: `Se guardo correctamente (ID: ${createdPost.id}).`,
       color: 'success',
       icon: 'i-lucide-circle-check',
     })
@@ -236,12 +257,24 @@ async function onSubmit(): Promise<void> {
       />
 
       <UButton
+        label="Guardar borrador"
+        type="submit"
+        color="neutral"
+        variant="soft"
+        icon="i-lucide-save"
+        :loading="isSubmitting"
+        :disabled="isSubmitting || !canSubmit"
+        @click="submitAction = 'draft'"
+      />
+
+      <UButton
+        label="Crear y publicar"
         type="submit"
         color="primary"
         icon="i-lucide-send-horizontal"
-        label="Publicar post"
-        :loading="isSubmitting"
+        :loading="isSubmitting && submitAction === 'publish'"
         :disabled="isSubmitting || !canSubmit"
+        @click="submitAction = 'publish'"
       />
     </div>
   </UForm>
