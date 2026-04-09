@@ -84,26 +84,27 @@ async function handleLogout() {
 
 <template>
   <ClientOnly>
-    <header class="sticky top-0 z-50 bg-default/75 backdrop-blur border-b border-default">
-      <div class="max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-(--ui-header-height)">
+    <header class="sticky top-0 z-50 border-b border-default/70 bg-default/70 backdrop-blur-xl supports-backdrop-filter:bg-default/50">
+      <div class="mx-auto max-w-(--ui-container) px-4 sm:px-6 lg:px-8">
+        <div class="flex h-(--ui-header-height) items-center justify-between gap-3">
           <!-- Logo -->
           <NuxtLink
             to="/"
-            class="text-xl font-bold text-highlighted hover:text-primary-500 transition-colors"
+            class="rounded-full px-3 py-1 text-lg font-semibold tracking-tight text-highlighted transition-colors hover:text-primary"
             @click="closeMobileMenu"
           >
             Blog App
           </NuxtLink>
 
           <!-- Desktop Navigation -->
-          <nav class="hidden lg:flex items-center gap-1">
+          <nav class="hidden items-center gap-1 rounded-full border border-default/80 bg-elevated/70 p-1 lg:flex">
             <UButton
               v-for="link in desktopNavLinks"
               :key="link.to"
               :to="link.to"
               variant="ghost"
               :label="link.label"
+              class="rounded-full"
             />
 
             <UButton
@@ -126,6 +127,7 @@ async function handleLogout() {
                 color="neutral"
                 :label="user?.fullName || user?.email || 'Mi cuenta'"
                 trailing-icon="i-lucide-chevron-down"
+                class="rounded-full"
               />
             </UDropdownMenu>
           </nav>
@@ -134,21 +136,21 @@ async function handleLogout() {
           <UButton
             variant="ghost"
             :icon="isMobileMenuOpen ? 'i-lucide-x' : 'i-lucide-menu'"
-            class="lg:hidden"
+            class="rounded-full lg:hidden"
             @click="toggleMobileMenu"
           />
         </div>
 
         <!-- Mobile Menu -->
-        <div v-if="isMobileMenuOpen" class="lg:hidden py-4 border-t border-default">
-          <nav class="flex flex-col gap-1">
+        <div v-if="isMobileMenuOpen" class="border-t border-default/80 py-4 lg:hidden">
+          <nav class="flex flex-col gap-2 rounded-2xl border border-default/70 bg-elevated/70 p-2">
             <UButton
               v-for="link in mobileNavLinks"
               :key="link.to"
               :to="link.to"
               variant="ghost"
               :label="link.label"
-              class="justify-start"
+              class="justify-start rounded-xl"
               @click="closeMobileMenu"
             />
 
@@ -158,7 +160,7 @@ async function handleLogout() {
               variant="ghost"
               label="Cerrar sesion"
               icon="i-lucide-log-out"
-              class="justify-start"
+              class="justify-start rounded-xl"
               @click="handleLogout"
             />
           </nav>
@@ -167,9 +169,9 @@ async function handleLogout() {
     </header>
 
     <template #fallback>
-      <header class="sticky top-0 z-50 bg-default/75 backdrop-blur border-b border-default">
-        <div class="max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="h-(--ui-header-height) flex items-center justify-between gap-4">
+      <header class="sticky top-0 z-50 border-b border-default/70 bg-default/70 backdrop-blur-xl supports-backdrop-filter:bg-default/50">
+        <div class="mx-auto max-w-(--ui-container) px-4 sm:px-6 lg:px-8">
+          <div class="flex h-(--ui-header-height) items-center justify-between gap-4">
             <USkeleton class="h-6 w-28" />
             <div class="hidden lg:flex items-center gap-2">
               <USkeleton class="h-8 w-18 rounded-md" />

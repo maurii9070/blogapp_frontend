@@ -1,2 +1,66 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@layer components {
+	.post-markdown {
+		--md-bk-color: transparent !important;
+		--md-border-color: transparent;
+		--md-color: var(--ui-text-toned);
+		--md-heading-color: var(--ui-text-highlighted);
+		--md-scrollbar-bg-color: transparent;
+		--md-scrollbar-thumb-color: color-mix(in srgb, var(--ui-border) 80%, transparent);
+	}
+
+	.post-markdown .md-editor,
+	.post-markdown .md-editor-preview-wrapper,
+	.post-markdown .md-editor-preview {
+		background-color: transparent !important;
+	}
+
+	.post-markdown .md-editor {
+		border: 0 !important;
+		box-shadow: none !important;
+	}
+
+	.post-markdown .md-editor-preview-wrapper {
+		box-shadow: none !important;
+	}
+
+	.post-markdown .md-editor-preview {
+		padding: 0 !important;
+		font-size: 1rem;
+		line-height: 1.8;
+		color: var(--ui-text-toned) !important;
+	}
+
+	.post-markdown .md-editor-preview :where(p, li, ul, ol, strong, em, span) {
+		color: var(--ui-text-toned) !important;
+	}
+
+	.post-markdown .md-editor-preview :where(h1, h2, h3, h4, h5, h6) {
+		color: var(--ui-text-highlighted) !important;
+	}
+
+	.post-markdown .md-editor-preview a {
+		color: var(--ui-primary) !important;
+	}
+
+	.post-markdown .md-editor-preview blockquote {
+		color: var(--ui-text-toned) !important;
+		border-left-color: color-mix(in srgb, var(--ui-primary) 40%, var(--ui-border));
+		background-color: color-mix(in srgb, var(--ui-primary) 5%, transparent);
+		border-radius: 0.75rem;
+		padding-block: 0.65rem;
+	}
+
+	.post-markdown .md-editor-preview pre {
+		border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent);
+		border-radius: 0.9rem;
+	}
+
+	.post-markdown .md-editor-preview code {
+		color: var(--ui-text-highlighted) !important;
+		background-color: color-mix(in srgb, var(--ui-border) 35%, transparent);
+		border-radius: 0.375rem;
+	}
+}
