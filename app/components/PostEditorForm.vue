@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ToolbarNames } from 'md-editor-v3'
 import type { InferInput } from 'valibot'
-import type { Category, CreatePostResponse } from '~/schemas/post'
+import type { Category, CreatePostResponse, Post } from '~/schemas/post'
 import { MdEditor } from 'md-editor-v3'
 import { CreatePostSchema } from '~/schemas/post'
 import 'md-editor-v3/lib/style.css'
@@ -11,7 +11,28 @@ interface CategoryOption {
   value: number
 }
 
+interface EditablePost extends Pick<Post, 'title' | 'content' | 'tagNames'> {
+  id: number
+  categoryId?: number
+  categoryName?: string
+  slug?: string
+}
+
+interface Props {
+  mode?: 'create' | 'edit'
+  postId?: number
+  initialPost?: EditablePost | null
+}
+
 type SubmitAction = 'draft' | 'publish'
+
+type UpsertPostPayload = Omit<InferInput<typeof CreatePostSchema>, 'authorId'>
+
+const props = withDefaults(defineProps<Props>(), {
+  mode: 'create',
+  postId: undefined,
+  initialPost: null,
+})
 
 const suggestedTagOptions = [
   'Nuxt',
@@ -30,6 +51,11 @@ const colorMode = useColorMode()
 const { start, finish } = useLoadingIndicator()
 const { user } = useSession()
 const { data: categories, pending: isLoadingCategories } = useCategories()
+
+const isEditing = computed(() => props.mode === 'edit' && Boolean(props.postId))
+const cancelDestination = computed(() => isEditing.value ? '/profile' : '/')
+const submitButtonLabel = computed(() => isEditing.value ? 'Guardar cambios' : 'Crear y publicar')
+const editorId = computed(() => isEditing.value ? `edit-post-editor-${props.postId}` : 'create-post-editor')
 
 const editorTheme = computed(() => colorMode.value === 'dark' ? 'dark' : 'light')
 
@@ -52,13 +78,43 @@ const categoryOptions = computed<CategoryOption[]>(() => {
 watch(
   categoryOptions,
   (options) => {
+    if (!options.length)
+      return
+
+    if (state.categoryId && options.some(option => option.value === state.categoryId))
+      return
+
+    if (props.initialPost?.categoryName) {
+      const byName = options.find(option => option.label.toLowerCase() === props.initialPost?.categoryName?.toLowerCase())
+
+      if (byName) {
+        state.categoryId = byName.value
+        return
+      }
+    }
+
     const [firstOption] = options
 
     if (!firstOption)
       return
 
-    if (!state.categoryId || !options.some(option => option.value === state.categoryId))
-      state.categoryId = firstOption.value
+    state.categoryId = firstOption.value
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.initialPost,
+  (initialPost) => {
+    if (!initialPost)
+      return
+
+    state.title = initialPost.title
+    state.content = initialPost.content
+    state.tagNames = [...initialPost.tagNames]
+
+    if (typeof initialPost.categoryId === 'number')
+      state.categoryId = initialPost.categoryId
   },
   { immediate: true },
 )
@@ -115,12 +171,50 @@ async function onSubmit(): Promise<void> {
     authorId: state.authorId,
   }
 
+  const upsertPayload: UpsertPostPayload = {
+    title: payload.title,
+    content: payload.content,
+    categoryId: payload.categoryId,
+    tagNames: payload.tagNames,
+  }
+
   try {
+    if (isEditing.value && props.postId) {
+      await $fetch(`/posts/${props.postId}`, {
+        baseURL: config.public.apiBase,
+        credentials: 'include',
+        method: 'PUT',
+        body: upsertPayload,
+      })
+
+      await refreshNuxtData('recent-posts')
+
+      toast.add({
+        title: 'Post actualizado',
+        description: 'Los cambios se guardaron correctamente.',
+        color: 'success',
+        icon: 'i-lucide-circle-check',
+      })
+
+      const targetSlug = props.initialPost?.slug
+
+      if (targetSlug) {
+        await navigateTo(`/posts/${props.postId}/${targetSlug}`)
+        return
+      }
+
+      await navigateTo('/profile')
+      return
+    }
+
     const createdPost = await $fetch<CreatePostResponse>('/posts', {
       baseURL: config.public.apiBase,
       credentials: 'include',
       method: 'POST',
-      body: payload,
+      body: {
+        ...upsertPayload,
+        authorId: payload.authorId,
+      },
     })
 
     if (submitAction.value === 'publish') {
@@ -129,6 +223,8 @@ async function onSubmit(): Promise<void> {
         credentials: 'include',
         method: 'PATCH',
       })
+
+      await refreshNuxtData('recent-posts')
 
       toast.add({
         title: 'Post publicado',
@@ -233,7 +329,7 @@ async function onSubmit(): Promise<void> {
       <ClientOnly>
         <MdEditor
           v-model="state.content"
-          editor-id="create-post-editor"
+          :editor-id="editorId"
           language="en-US"
           :theme="editorTheme"
           :toolbars-exclude="excludedToolbarItems"
@@ -248,7 +344,7 @@ async function onSubmit(): Promise<void> {
 
     <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
       <UButton
-        to="/"
+        :to="cancelDestination"
         color="neutral"
         variant="soft"
         icon="i-lucide-arrow-left"
@@ -257,6 +353,7 @@ async function onSubmit(): Promise<void> {
       />
 
       <UButton
+        v-if="!isEditing"
         label="Guardar borrador"
         type="submit"
         color="neutral"
@@ -268,13 +365,13 @@ async function onSubmit(): Promise<void> {
       />
 
       <UButton
-        label="Crear y publicar"
+        :label="submitButtonLabel"
         type="submit"
         color="primary"
-        icon="i-lucide-send-horizontal"
-        :loading="isSubmitting && submitAction === 'publish'"
+        :icon="isEditing ? 'i-lucide-check' : 'i-lucide-send-horizontal'"
+        :loading="isEditing ? isSubmitting : isSubmitting && submitAction === 'publish'"
         :disabled="isSubmitting || !canSubmit"
-        @click="submitAction = 'publish'"
+        @click="submitAction = isEditing ? 'draft' : 'publish'"
       />
     </div>
   </UForm>
