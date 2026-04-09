@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { MdPreview } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 import type { Post } from '~/schemas/post'
 
 const route = useRoute()
@@ -106,10 +108,10 @@ async function onPublish(): Promise<void> {
     </template>
 
     <template v-else-if="post">
-      <article class="max-w-3xl">
+      <article class="mx-auto max-w-4xl space-y-8 md:space-y-10">
         <div
           v-if="canPublish"
-          class="mb-6 rounded-xl border border-warning/40 bg-warning/10 p-4 sm:flex sm:items-center sm:justify-between sm:gap-4"
+          class="rounded-2xl border border-warning/40 bg-warning/10 p-4 sm:flex sm:items-center sm:justify-between sm:gap-4"
         >
           <div class="space-y-1">
             <p class="text-sm font-semibold text-highlighted">
@@ -131,33 +133,36 @@ async function onPublish(): Promise<void> {
         </div>
 
         <!-- Header -->
-        <header class="mb-8">
-          <h1 class="text-4xl font-bold text-highlighted mb-4">
+        <header class="space-y-5 border-b border-default/70 pb-6 md:space-y-6 md:pb-8">
+          <h1 class="text-3xl font-semibold tracking-tight text-highlighted sm:text-4xl lg:text-5xl">
             {{ post.title }}
           </h1>
 
-          <div class="flex flex-wrap items-center gap-4 text-sm text-muted">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
             <UBadge
               :color="isDraft ? 'warning' : 'success'"
               variant="soft"
+              class="rounded-full px-3 py-1"
             >
               {{ isDraft ? 'Borrador' : 'Publicado' }}
             </UBadge>
-            <span>{{ publicationDateLabel }}</span>
-            <span>{{ formatDate(publicationDateValue) }}</span>
-            <span>·</span>
-            <UBadge v-if="post.categoryName" color="primary" variant="soft">
+            <span class="inline-flex items-center gap-2">
+              <UIcon name="i-lucide-calendar" class="size-4" />
+              {{ publicationDateLabel }} {{ formatDate(publicationDateValue) }}
+            </span>
+            <UBadge v-if="post.categoryName" color="primary" variant="soft" class="rounded-full px-3 py-1">
               {{ post.categoryName }}
             </UBadge>
           </div>
 
           <!-- Tags -->
-          <div v-if="post.tagNames?.length" class="flex flex-wrap gap-2 mt-4">
+          <div v-if="post.tagNames?.length" class="flex flex-wrap gap-2">
             <UBadge
               v-for="tag in post.tagNames"
               :key="tag"
               variant="subtle"
               color="neutral"
+              class="rounded-full px-3 py-1"
             >
               {{ tag }}
             </UBadge>
@@ -165,9 +170,16 @@ async function onPublish(): Promise<void> {
         </header>
 
         <!-- Content -->
-        <div class="prose prose-lg dark:prose-invert max-w-none">
-          {{ post.content }}
-        </div>
+        <section class="px-1 py-2 sm:px-2 sm:py-3 md:px-3 md:py-4">
+          <MdPreview
+            editor-id="post-reader"
+            class="post-markdown"
+            preview-theme="github"
+            code-theme="github"
+            :model-value="post.content"
+          />
+        </section>
+        <div class="h-2" />
       </article>
     </template>
 
