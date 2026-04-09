@@ -62,6 +62,7 @@ async function onPublish(): Promise<void> {
     })
 
     await refresh()
+    await refreshNuxtData('recent-posts')
 
     if (post.value?.slug && post.value.slug !== route.params.slug)
       await navigateTo(`/posts/${post.value.id}/${post.value.slug}`, { replace: true })
