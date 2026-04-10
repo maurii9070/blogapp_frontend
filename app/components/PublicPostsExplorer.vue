@@ -94,7 +94,7 @@ function onClearFilters(): void {
           />
         </UFormField>
 
-        <UFormField label="Tamano de pagina">
+        <UFormField label="Tamaño de pagina">
           <USelect
             v-model="pageSizeModel"
             :items="pageSizeOptions"
