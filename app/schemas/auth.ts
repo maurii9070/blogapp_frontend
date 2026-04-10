@@ -47,3 +47,15 @@ export const RegisterRequestSchema = v.pipe(
 
 export type LoginRequest = v.InferInput<typeof LoginRequestSchema>
 export type RegisterRequest = v.InferInput<typeof RegisterRequestSchema>
+
+export interface LoginResponse {
+  success: boolean
+}
+
+export interface RegisterResponse<T = unknown> {
+  result: T
+}
+
+export interface LogoutResponse {
+  success: boolean
+}

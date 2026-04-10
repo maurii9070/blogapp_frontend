@@ -36,7 +36,7 @@ function formatDate(dateString: string): string {
 
     <template #footer>
       <NuxtLink
-        to="/"
+        to="/posts"
         class="flex items-center justify-center gap-1 text-sm text-primary-500 hover:text-primary-600 transition-colors"
       >
         Ver todos los posts

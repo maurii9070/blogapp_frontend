@@ -9,11 +9,20 @@ export const PublishedPostSchema = v.object({
 })
 export type PublishedPost = v.InferOutput<typeof PublishedPostSchema>
 
+export interface SearchPostsQuery {
+  q?: string
+  categoryId?: number
+  tags?: string[]
+  page?: number
+  pageSize?: number
+}
+
 export const PostSchema = v.object({
   id: v.number(),
   title: v.string(),
   content: v.string(),
   slug: v.string(),
+  authorFullName: v.optional(v.string()),
   authorId: v.optional(v.string()),
   authorShortId: v.optional(v.string()),
   createdAt: v.string(),
