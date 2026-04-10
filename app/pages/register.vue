@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import type { InferInput } from 'valibot'
-import { LoginRequestSchema } from '~/schemas/auth'
+import { RegisterRequestSchema } from '~/schemas/auth'
 
 definePageMeta({
   layout: 'auth',
 })
 
 const toast = useToast()
-const { login } = useAuth()
-const route = useRoute()
+const { register } = useAuth()
 
 const { start, finish } = useLoadingIndicator()
 
-const state = reactive<InferInput<typeof LoginRequestSchema>>({
+const state = reactive<InferInput<typeof RegisterRequestSchema>>({
+  fullName: '',
   email: '',
   password: '',
-  rememberMe: false,
+  passwordConfirmation: '',
 })
 
 const isSubmitting = ref(false)
@@ -25,21 +25,19 @@ async function onSubmit(): Promise<void> {
     return
 
   start()
-
   isSubmitting.value = true
 
   try {
-    await login(state)
+    await register(state)
 
     toast.add({
-      title: 'Sesion iniciada',
-      description: 'Bienvenido de nuevo.',
+      title: 'Cuenta creada',
+      description: 'Tu registro fue exitoso.',
       color: 'success',
       icon: 'i-lucide-circle-check',
     })
 
-    const redirectTo = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    await navigateTo(redirectTo)
+    await navigateTo('/')
   }
   catch (error) {
     finish({ error: true })
@@ -47,8 +45,8 @@ async function onSubmit(): Promise<void> {
       console.error(error)
 
     toast.add({
-      title: 'No se pudo iniciar sesion',
-      description: 'Verifica tu email y password e intenta nuevamente.',
+      title: 'No se pudo crear la cuenta',
+      description: 'Revisa tus datos e intenta nuevamente.',
       color: 'error',
       icon: 'i-lucide-circle-x',
     })
@@ -71,19 +69,29 @@ async function onSubmit(): Promise<void> {
           Blog App
         </p>
         <h1 class="text-2xl font-semibold text-highlighted">
-          Iniciar sesion
+          Crear cuenta
         </h1>
         <p class="text-sm text-muted">
-          Ingresa tus datos para acceder a tu cuenta.
+          Completa tus datos para empezar a publicar.
         </p>
       </div>
 
       <UForm
-        :schema="LoginRequestSchema"
+        :schema="RegisterRequestSchema"
         :state="state"
         class="space-y-4"
         @submit="onSubmit"
       >
+        <UFormField name="fullName" label="Nombre completo" required>
+          <UInput
+            v-model="state.fullName"
+            placeholder="Juan Perez"
+            icon="i-lucide-user-round"
+            class="w-full"
+            autocomplete="name"
+          />
+        </UFormField>
+
         <UFormField name="email" label="Email" required>
           <UInput
             v-model="state.email"
@@ -95,19 +103,26 @@ async function onSubmit(): Promise<void> {
           />
         </UFormField>
 
-        <UFormField name="password" label="Password" required>
+        <UFormField name="password" label="Contraseña" required>
           <UInput
             v-model="state.password"
             type="password"
             placeholder="********"
             icon="i-lucide-lock"
             class="w-full"
-            autocomplete="current-password"
+            autocomplete="new-password"
           />
         </UFormField>
 
-        <UFormField name="rememberMe">
-          <UCheckbox v-model="state.rememberMe" label="Recordarme" />
+        <UFormField name="passwordConfirmation" label="Confirmar contraseña" required>
+          <UInput
+            v-model="state.passwordConfirmation"
+            type="password"
+            placeholder="********"
+            icon="i-lucide-shield-check"
+            class="w-full"
+            autocomplete="new-password"
+          />
         </UFormField>
 
         <UButton
@@ -116,13 +131,13 @@ async function onSubmit(): Promise<void> {
           block
           :loading="isSubmitting"
           :disabled="isSubmitting"
-          label="Entrar"
+          label="Crear cuenta"
         />
 
         <p class="text-center text-sm text-muted">
-          No tienes una cuenta?
-          <NuxtLink to="/register" class="font-medium text-primary hover:underline">
-            Registrate aqui
+          Ya tienes cuenta?
+          <NuxtLink to="/login" class="font-medium text-primary hover:underline">
+            Inicia sesion aqui
           </NuxtLink>
         </p>
       </UForm>

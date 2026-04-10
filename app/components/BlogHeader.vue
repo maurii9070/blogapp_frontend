@@ -9,6 +9,11 @@ const desktopNavLinks = [
   { label: 'Inicio', to: '/' },
 ]
 
+const guestNavLinks = [
+  { label: 'Iniciar sesion', to: '/login' },
+  { label: 'Registrarse', to: '/register' },
+]
+
 const authenticatedNavLinks = [
   { label: 'Mi perfil', to: '/profile', icon: 'i-lucide-user-round' },
   { label: 'Crear post', to: '/posts/create', icon: 'i-lucide-square-pen' },
@@ -41,7 +46,7 @@ const mobileNavLinks = computed(() => {
   const base = [{ label: 'Inicio', to: '/' }]
 
   if (!isAuthenticated.value)
-    return [...base, { label: 'Iniciar sesion', to: '/login' }]
+    return [...base, ...guestNavLinks]
 
   return [...base, ...authenticatedNavLinks.map(({ label, to }) => ({ label, to }))]
 })
@@ -115,7 +120,16 @@ async function handleLogout() {
               :disabled="true"
             />
 
-            <UButton v-else-if="!isAuthenticated" variant="ghost" label="Iniciar sesion" to="/login" />
+            <template v-else-if="!isAuthenticated">
+              <UButton
+                v-for="link in guestNavLinks"
+                :key="link.to"
+                :to="link.to"
+                variant="ghost"
+                :label="link.label"
+                class="rounded-full"
+              />
+            </template>
 
             <UDropdownMenu
               v-else

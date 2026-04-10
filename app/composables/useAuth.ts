@@ -1,4 +1,4 @@
-import type { LoginRequest } from '~/schemas/auth'
+import type { LoginRequest, RegisterRequest } from '~/schemas/auth'
 
 export function useAuth() {
   const config = useRuntimeConfig()
@@ -6,6 +6,17 @@ export function useAuth() {
 
   async function login(payload: LoginRequest): Promise<void> {
     await $fetch('/users/login', {
+      baseURL: config.public.apiBase,
+      credentials: 'include',
+      method: 'POST',
+      body: payload,
+    })
+
+    await fetchMe()
+  }
+
+  async function register(payload: RegisterRequest): Promise<void> {
+    await $fetch('/users/register', {
       baseURL: config.public.apiBase,
       credentials: 'include',
       method: 'POST',
@@ -27,6 +38,7 @@ export function useAuth() {
 
   return {
     login,
+    register,
     logout,
   }
 }
