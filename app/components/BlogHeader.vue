@@ -6,13 +6,12 @@ const { status, user, isAuthenticated } = useSession()
 const { logout } = useAuth()
 
 const desktopNavLinks = [
-  { label: 'Inicio', to: '/' },
-  { label: 'Posts', to: '/posts' },
+  { label: 'Inicio', to: '/', icon: 'i-lucide-house' },
 ]
 
 const guestNavLinks = [
-  { label: 'Iniciar sesion', to: '/login' },
-  { label: 'Registrarse', to: '/register' },
+  { label: 'Iniciar sesion', to: '/login', icon: 'i-lucide-log-in' },
+  { label: 'Registrarse', to: '/register', icon: 'i-lucide-user-round-plus' },
 ]
 
 const authenticatedNavLinks = [
@@ -46,14 +45,13 @@ const userMenuItems = computed(() => ([
 
 const mobileNavLinks = computed(() => {
   const base = [
-    { label: 'Inicio', to: '/' },
-    { label: 'Posts', to: '/posts' },
+    { label: 'Inicio', to: '/', icon: 'i-lucide-house' },
   ]
 
   if (!isAuthenticated.value)
     return [...base, ...guestNavLinks]
 
-  return [...base, ...authenticatedNavLinks.map(({ label, to }) => ({ label, to }))]
+  return [...base, ...authenticatedNavLinks.map(({ label, to, icon }) => ({ label, to, icon }))]
 })
 
 function toggleMobileMenu() {
@@ -100,60 +98,74 @@ async function handleLogout() {
           <!-- Logo -->
           <NuxtLink
             to="/"
-            class="rounded-full px-3 py-1 text-lg font-semibold tracking-tight text-highlighted transition-colors hover:text-primary"
+            class="inline-flex items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-lg font-semibold tracking-tight text-primary transition-colors hover:bg-primary/15"
             @click="closeMobileMenu"
           >
+            <UIcon name="i-lucide-feather" class="size-4" />
             Blog App
           </NuxtLink>
 
           <!-- Desktop Navigation -->
-          <nav class="hidden items-center gap-1 rounded-full border border-default/80 bg-elevated/70 p-1 lg:flex">
-            <UButton
-              v-for="link in desktopNavLinks"
-              :key="link.to"
-              :to="link.to"
-              variant="ghost"
-              :label="link.label"
-              class="rounded-full"
-            />
-
-            <UButton
-              v-if="status === 'unknown' || status === 'loading'"
-              variant="soft"
-              color="neutral"
-              label="Cargando..."
-              :disabled="true"
-            />
-
-            <template v-else-if="!isAuthenticated">
+          <nav class="hidden items-center gap-2 rounded-2xl border border-default/80 bg-elevated/80 p-2 shadow-sm lg:flex">
+            <div class="flex items-center gap-1 rounded-xl border border-primary/30 bg-primary/10 p-1">
               <UButton
-                v-for="link in guestNavLinks"
+                v-for="link in desktopNavLinks"
                 :key="link.to"
                 :to="link.to"
                 variant="ghost"
+                color="primary"
                 :label="link.label"
+                :icon="link.icon"
                 class="rounded-full"
               />
-            </template>
+            </div>
 
-            <UDropdownMenu
-              v-else
-              :items="userMenuItems"
-              :content="{ align: 'end', sideOffset: 8 }"
-            >
+            <div class="h-6 w-px bg-border" />
+
+            <div class="flex items-center gap-1 rounded-xl border border-secondary/30 bg-secondary/10 p-1">
               <UButton
+                v-if="status === 'unknown' || status === 'loading'"
                 variant="soft"
-                color="neutral"
-                :label="user?.fullName || user?.email || 'Mi cuenta'"
-                trailing-icon="i-lucide-chevron-down"
-                class="rounded-full"
+                color="secondary"
+                label="Cargando..."
+                icon="i-lucide-loader-circle"
+                :disabled="true"
               />
-            </UDropdownMenu>
+
+              <template v-else-if="!isAuthenticated">
+                <UButton
+                  v-for="link in guestNavLinks"
+                  :key="link.to"
+                  :to="link.to"
+                  variant="ghost"
+                  color="secondary"
+                  :label="link.label"
+                  :icon="link.icon"
+                  class="rounded-full"
+                />
+              </template>
+
+              <UDropdownMenu
+                v-else
+                :items="userMenuItems"
+                :content="{ align: 'end', sideOffset: 8 }"
+              >
+                <UButton
+                  variant="soft"
+                  color="secondary"
+                  :label="user?.fullName || user?.email || 'Mi cuenta'"
+                  icon="i-lucide-circle-user-round"
+                  trailing-icon="i-lucide-chevron-down"
+                  class="rounded-full"
+                />
+              </UDropdownMenu>
+            </div>
           </nav>
 
           <!-- Mobile Menu Button -->
           <UButton
-            variant="ghost"
+            variant="soft"
+            color="primary"
             :icon="isMobileMenuOpen ? 'i-lucide-x' : 'i-lucide-menu'"
             class="rounded-full lg:hidden"
             @click="toggleMobileMenu"
@@ -162,21 +174,49 @@ async function handleLogout() {
 
         <!-- Mobile Menu -->
         <div v-if="isMobileMenuOpen" class="border-t border-default/80 py-4 lg:hidden">
-          <nav class="flex flex-col gap-2 rounded-2xl border border-default/70 bg-elevated/70 p-2">
-            <UButton
-              v-for="link in mobileNavLinks"
-              :key="link.to"
-              :to="link.to"
-              variant="ghost"
-              :label="link.label"
-              class="justify-start rounded-xl"
-              @click="closeMobileMenu"
-            />
+          <nav class="flex flex-col gap-3 rounded-2xl border border-default/70 bg-elevated/80 p-3">
+            <div class="rounded-xl border border-primary/30 bg-primary/10 p-2">
+              <p class="px-2 pb-2 text-xs font-medium uppercase tracking-wide text-primary">
+                Navegacion
+              </p>
+              <div class="flex flex-col gap-2">
+                <UButton
+                  v-for="link in desktopNavLinks"
+                  :key="`mobile-base-${link.to}`"
+                  :to="link.to"
+                  variant="ghost"
+                  color="primary"
+                  :label="link.label"
+                  :icon="link.icon"
+                  class="justify-start rounded-xl"
+                  @click="closeMobileMenu"
+                />
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-secondary/30 bg-secondary/10 p-2">
+              <p class="px-2 pb-2 text-xs font-medium uppercase tracking-wide text-secondary">
+                Cuenta
+              </p>
+              <div class="flex flex-col gap-2">
+                <UButton
+                  v-for="link in mobileNavLinks.filter(link => link.to !== '/')"
+                  :key="`mobile-account-${link.to}`"
+                  :to="link.to"
+                  variant="ghost"
+                  color="secondary"
+                  :label="link.label"
+                  :icon="link.icon"
+                  class="justify-start rounded-xl"
+                  @click="closeMobileMenu"
+                />
+              </div>
+            </div>
 
             <UButton
               v-if="isAuthenticated"
               color="error"
-              variant="ghost"
+              variant="soft"
               label="Cerrar sesion"
               icon="i-lucide-log-out"
               class="justify-start rounded-xl"
