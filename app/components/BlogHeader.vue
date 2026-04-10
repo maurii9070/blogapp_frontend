@@ -7,6 +7,7 @@ const { logout } = useAuth()
 
 const desktopNavLinks = [
   { label: 'Inicio', to: '/' },
+  { label: 'Posts', to: '/posts' },
 ]
 
 const guestNavLinks = [
@@ -15,7 +16,8 @@ const guestNavLinks = [
 ]
 
 const authenticatedNavLinks = [
-  { label: 'Mi perfil', to: '/profile', icon: 'i-lucide-user-round' },
+  { label: 'Editar perfil', to: '/me/profile', icon: 'i-lucide-user-round-cog' },
+  { label: 'Mis posts', to: '/profile', icon: 'i-lucide-user-round' },
   { label: 'Crear post', to: '/posts/create', icon: 'i-lucide-square-pen' },
 ]
 
@@ -43,7 +45,10 @@ const userMenuItems = computed(() => ([
 ]))
 
 const mobileNavLinks = computed(() => {
-  const base = [{ label: 'Inicio', to: '/' }]
+  const base = [
+    { label: 'Inicio', to: '/' },
+    { label: 'Posts', to: '/posts' },
+  ]
 
   if (!isAuthenticated.value)
     return [...base, ...guestNavLinks]

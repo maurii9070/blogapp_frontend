@@ -13,8 +13,10 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+    '/posts': { prerender: true },
     '/login': { ssr: false },
     '/profile': { ssr: false },
+    '/me/profile': { ssr: false },
     '/posts/create': { ssr: false },
     '/posts/**/edit': { ssr: false },
   },
